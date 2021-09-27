@@ -4,14 +4,14 @@ import { PaymentPlanSettings } from './types'
 import { DefaultWidgetConfig, SettingsLiteral } from '@/widgets/config'
 import { PaymentPlansRenderer } from '@/widgets/PaymentPlans/PaymentPlansRenderer'
 import { IEligibility } from '@alma/client/dist/types/entities/eligibility'
-
+​
 type PaymentPlanDefaultConfig = DefaultWidgetConfig<PaymentPlanSettings>
-
+​
 export class PaymentPlans extends Widget<PaymentPlanSettings> {
   private results: IEligibility[]
   private loading: boolean
   private fetchError: boolean
-
+​
   defaultConfig(): PaymentPlanDefaultConfig {
     return {
       purchaseAmount: 100,
@@ -19,7 +19,7 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
       plans: [
         {
           installmentsCount: 3,
-          minAmount: 10000,
+          minAmount: 0,
           maxAmount: 200000,
         },
         {
@@ -36,24 +36,26 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
       },
     }
   }
-
+​
   constructor(almaClient: Client, settings: SettingsLiteral<PaymentPlanSettings>) {
     super(almaClient, settings)
     this.results = []
     this.loading = false
     this.fetchError = false
   }
-
+​
   private async fetchResults() {
     // Start with an empty list of results
     const results: Array<Eligibility | number> = []
-
+​
     const { purchaseAmount, plans } = this.config
     const installmentsCountsToQuery = []
-
+​
     // For each plan to be queried, check whether it's worth querying (i.e. is the purchase amount
     // is within the plan's boundaries) and act accordingly
     for (const plan of plans) {
+
+      if(plan.minAmount != 0){
       if (purchaseAmount < plan.minAmount || purchaseAmount > plan.maxAmount) {
         // purchase amount is out of bounds: build a non-eligible result
         results.push(
@@ -68,13 +70,20 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
             },
           }),
         )
-      } else {
+        }else{
+           installmentsCountsToQuery.push(plan.installmentsCount)
+           results.push(installmentsCountsToQuery.length - 1)
+         }
+
+      }
+      else {
         installmentsCountsToQuery.push(plan.installmentsCount)
         // Push a marker into the results array to easily merge back handmade results with API ones
         results.push(installmentsCountsToQuery.length - 1)
-      }
-    }
-
+       }
+     
+  }
+​
     // Now, query the API for plans that were valid for the requested purchase amount
     let eligibilities: IEligibility[]
     try {
@@ -89,14 +98,14 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
       this.fetchError = true
       eligibilities = []
     }
-
+​
     this.results = results
       .map((r) => (typeof r === 'number' ? eligibilities[r] : r))
       // In case of network error, eligibilities might be empty and results contain `undefined`
       // entries as a consequence, so make sure to filter them out
       .filter(Boolean)
   }
-
+​
   protected async renderComponent(): Promise<JSX.Element> {
     // Compute/request results if we don't have them yet
     if (!this.results.length && !this.loading && !this.fetchError) {
@@ -106,12 +115,12 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
         this.render()
       })
     }
-
+​
     const retry = () => {
       this.fetchError = false
       this.render()
     }
-
+​
     const { purchaseAmount, plans, transitionDelay } = this.config
     return (
       <PaymentPlansRenderer
