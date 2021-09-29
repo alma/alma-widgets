@@ -47,32 +47,32 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
     // For each plan to be queried, check whether it's worth querying (i.e. is the purchase amount
     // is within the plan's boundaries) and act accordingly
     for (const plan of plans) {
-      if(plan.minAmount != 0){
-      if (purchaseAmount < plan.minAmount || purchaseAmount > plan.maxAmount) {
-        // purchase amount is out of bounds: build a non-eligible result
-        results.push(
-          new Eligibility({
-            eligible: false,
-            installments_count: plan.installmentsCount,
-            constraints: {
-              purchase_amount: {
-                minimum: plan.minAmount,
-                maximum: plan.maxAmount,
-              },
-            },
-          }),
-        )
-        }else{
-           installmentsCountsToQuery.push(plan.installmentsCount)
-           results.push(installmentsCountsToQuery.length - 1)
-         }
+    if (plan.minAmount != 0) {
+        if (purchaseAmount < plan.minAmount || purchaseAmount > plan.maxAmount) {
+            // purchase amount is out of bounds: build a non-eligible result
+            results.push(
+                new Eligibility({
+                    eligible: false,
+                    installments_count: plan.installmentsCount,
+                    constraints: {
+                        purchase_amount: {
+                            minimum: plan.minAmount,
+                            maximum: plan.maxAmount,
+                        },
+                    },
+                }),
+            )
+        } else {
+            installmentsCountsToQuery.push(plan.installmentsCount)
+            results.push(installmentsCountsToQuery.length - 1)
+        }
 
-      }else {
+    } else {
         installmentsCountsToQuery.push(plan.installmentsCount)
         // Push a marker into the results array to easily merge back handmade results with API ones
         results.push(installmentsCountsToQuery.length - 1)
-       }
-  }
+    }
+}
     // Now, query the API for plans that were valid for the requested purchase amount
     let eligibilities: IEligibility[]
     try {
