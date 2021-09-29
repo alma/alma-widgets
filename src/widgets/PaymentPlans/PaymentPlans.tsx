@@ -4,7 +4,6 @@ import { PaymentPlanSettings } from './types'
 import { DefaultWidgetConfig, SettingsLiteral } from '@/widgets/config'
 import { PaymentPlansRenderer } from '@/widgets/PaymentPlans/PaymentPlansRenderer'
 import { IEligibility } from '@alma/client/dist/types/entities/eligibility'
-​
 type PaymentPlanDefaultConfig = DefaultWidgetConfig<PaymentPlanSettings>
 ​
 export class PaymentPlans extends Widget<PaymentPlanSettings> {
