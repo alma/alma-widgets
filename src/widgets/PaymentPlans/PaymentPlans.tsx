@@ -9,7 +9,6 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
   private results: IEligibility[]
   private loading: boolean
   private fetchError: boolean
-​
   defaultConfig(): PaymentPlanDefaultConfig {
     return {
       purchaseAmount: 100,
@@ -34,21 +33,17 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
       },
     }
   }
-​
   constructor(almaClient: Client, settings: SettingsLiteral<PaymentPlanSettings>) {
     super(almaClient, settings)
     this.results = []
     this.loading = false
     this.fetchError = false
   }
-​
   private async fetchResults() {
     // Start with an empty list of results
     const results: Array<Eligibility | number> = []
-​
     const { purchaseAmount, plans } = this.config
     const installmentsCountsToQuery = []
-​
     // For each plan to be queried, check whether it's worth querying (i.e. is the purchase amount
     // is within the plan's boundaries) and act accordingly
     for (const plan of plans) {
@@ -81,7 +76,6 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
        }
      
   }
-​
     // Now, query the API for plans that were valid for the requested purchase amount
     let eligibilities: IEligibility[]
     try {
@@ -96,14 +90,12 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
       this.fetchError = true
       eligibilities = []
     }
-​
     this.results = results
       .map((r) => (typeof r === 'number' ? eligibilities[r] : r))
       // In case of network error, eligibilities might be empty and results contain `undefined`
       // entries as a consequence, so make sure to filter them out
       .filter(Boolean)
   }
-​
   protected async renderComponent(): Promise<JSX.Element> {
     // Compute/request results if we don't have them yet
     if (!this.results.length && !this.loading && !this.fetchError) {
@@ -113,12 +105,10 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
         this.render()
       })
     }
-​
     const retry = () => {
       this.fetchError = false
       this.render()
     }
-​
     const { purchaseAmount, plans, transitionDelay } = this.config
     return (
       <PaymentPlansRenderer
