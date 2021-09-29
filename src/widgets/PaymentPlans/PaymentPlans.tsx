@@ -68,13 +68,11 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
            results.push(installmentsCountsToQuery.length - 1)
          }
 
-      }
-      else {
+      }else {
         installmentsCountsToQuery.push(plan.installmentsCount)
         // Push a marker into the results array to easily merge back handmade results with API ones
         results.push(installmentsCountsToQuery.length - 1)
        }
-     
   }
     // Now, query the API for plans that were valid for the requested purchase amount
     let eligibilities: IEligibility[]
