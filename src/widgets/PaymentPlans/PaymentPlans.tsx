@@ -47,7 +47,6 @@ export class PaymentPlans extends Widget<PaymentPlanSettings> {
     // For each plan to be queried, check whether it's worth querying (i.e. is the purchase amount
     // is within the plan's boundaries) and act accordingly
     for (const plan of plans) {
-
       if(plan.minAmount != 0){
       if (purchaseAmount < plan.minAmount || purchaseAmount > plan.maxAmount) {
         // purchase amount is out of bounds: build a non-eligible result
