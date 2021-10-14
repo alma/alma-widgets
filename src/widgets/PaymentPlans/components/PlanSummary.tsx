@@ -23,10 +23,9 @@ function eligiblePlan(eligibility: EligibleEligibility): JSX.Element {
 
 function nonEligiblePlan(purchaseAmount: number, eligibility: NotEligibleEligibility): JSX.Element {
   // TODO: Eligibility types need some fixing on the API Client
-  const reasons = (eligibility as any).reasons
   const constraints = (eligibility as any).constraints.purchase_amount
 
-  if (reasons || !constraints) {
+  if (!constraints) {
     // No matter the reason, if there's one we'll just output a generic "Unavailable" text
     return <span>Indisponible</span>
   }
